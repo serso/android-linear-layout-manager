@@ -46,6 +46,7 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile project(':lib')
     compile 'org.solovyev.android:material:0.1.3@aar'
+    compile 'com.google.code.findbugs:jsr305:2.0.3'
 }
 
 task androidJavadocs(type: Javadoc) {
