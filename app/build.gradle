@@ -1,0 +1,124 @@
+/*
+ * Copyright 2014 serso aka se.solovyev
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ * Contact details
+ *
+ * Email: se.solovyev@gmail.com
+ * Site:  http://se.solovyev.org
+ */
+
+apply plugin: 'com.android.application'
+apply plugin: 'maven'
+apply plugin: 'signing'
+
+android {
+    compileSdkVersion android_sdk_version()
+    buildToolsVersion android_build_tools_version()
+    defaultConfig {
+        minSdkVersion android_min_sdk_version()
+        targetSdkVersion android_sdk_version()
+        versionCode version_code()
+        versionName version_name()
+    }
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.txt'
+            zipAlignEnabled true
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile project(':lib')
+    compile 'org.solovyev.android:material:0.1.3@aar'
+}
+
+task androidJavadocs(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+    configurations.compile.each { File file -> classpath += project.files(file.path) }
+}
+
+task androidJavadocsJar(type: Jar, dependsOn: androidJavadocs) {
+    classifier = 'javadoc'
+    from androidJavadocs.destinationDir
+}
+
+task androidSourcesJar(type: Jar) {
+    classifier = 'sources'
+    from android.sourceSets.main.java.srcDirs
+}
+
+artifacts {
+    archives androidSourcesJar
+    archives file: file('build/outputs/apk/linear-layout-manager-release.apk'), name: 'linear-layout-manager-app', type: 'apk'
+    archives file: file('build/outputs/mapping/release/mapping.txt'), name: 'linear-layout-manager-app', classifier: 'proguard', type: 'txt'
+}
+
+signing {
+    sign configurations.archives
+}
+
+group = "org.solovyev.android.views"
+archivesBaseName = "linear-layout-manager-app"
+version = version_name()
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            pom.project {
+                name 'Linear Layout Manager App'
+                packaging 'apk'
+                description 'Linera Layout Manager sample application'
+                url 'https://github.com/serso/android-linear-layout-manager'
+
+                scm {
+                    url 'https://github.com/serso/android-linear-layout-manager'
+                    connection 'scm:https://serso@github.com/serso/android-linear-layout-manager.git'
+                    developerConnection 'scm:git://github.com/serso/android-linear-layout-manager.git'
+                }
+
+                licenses {
+                    license {
+                        name 'The Apache Software License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        distribution 'repo'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id 'se.solovyev'
+                        name 'Sergey Solovyev'
+                        email 'se.solovyev@gmail.com'
+                    }
+                }
+            }
+        }
+    }
+}

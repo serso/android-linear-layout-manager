@@ -1,0 +1,41 @@
+<LinearLayout
+		xmlns:android="http://schemas.android.com/apk/res/android"
+		style="@style/MaterialActivity"
+		android:orientation="vertical">
+
+	<TextView style="@style/MaterialCard" android:id="@+id/counter" android:padding="5dp"/>
+
+	<FrameLayout
+			android:layout_width="match_parent"
+			android:layout_height="0dp"
+			android:layout_weight="1">
+
+		<android.support.v7.widget.RecyclerView
+				style="@style/MaterialCard"
+				android:id="@+id/recyclerview"
+				android:scrollbars="vertical"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:paddingTop="@dimen/material_card_padding_vertical"
+				android:paddingBottom="@dimen/material_card_padding_vertical"
+				android:listSelector="@drawable/material_clickable_selector"/>
+
+	</FrameLayout>
+
+	<LinearLayout style="@style/MaterialCard"
+				  android:layout_width="wrap_content"
+				  android:layout_height="wrap_content"
+				  android:orientation="horizontal"
+				  android:layout_gravity="bottom|right">
+		<ImageView android:id="@+id/rotate"
+				   android:layout_width="wrap_content"
+				   android:layout_height="wrap_content"
+				   android:src="@drawable/ic_refresh_grey600_48dp"/>
+		<View android:layout_width="5dp" android:layout_height="match_parent"/>
+		<ImageView android:id="@+id/playpause"
+				   android:layout_width="wrap_content"
+				   android:layout_height="wrap_content"
+				   android:src="@drawable/ic_pause_grey600_48dp"/>
+	</LinearLayout>
+
+</LinearLayout>
