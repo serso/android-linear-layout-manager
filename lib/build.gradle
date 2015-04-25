@@ -83,6 +83,7 @@ signing {
 }
 
 group = "org.solovyev.android.views"
+archivesBaseName = "linear-layout-manager"
 version = version_name()
 
 uploadArchives {
