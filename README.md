@@ -15,7 +15,7 @@ to avoid unnecessary measuring.
 
 ## Installation
 Gradle dependency:
-<pre><code>compile 'org.solovyev.android.views:linear-layout-manager:0.2@aar'</core></pre>
+<pre><code>compile 'org.solovyev.android.views:linear-layout-manager:0.2@aar'</code></pre>
 Maven dependency:
 <pre><code><dependency>
     <groupId>org.solovyev.android.views</groupId>
