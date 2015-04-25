@@ -22,7 +22,7 @@ Maven dependency:
     <artifactId>linear-layout-manager</artifactId>
     <version>0.2</version>
     <type>apklib</type>
-</dependency></core></pre>
+</dependency></code></pre>
 
 ## Applications
 
