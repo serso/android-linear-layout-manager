@@ -2,11 +2,18 @@ package org.solovyev.android.views.llm;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 
 /**
  * {@link android.support.v7.widget.LinearLayoutManager} which wraps its content. Note that this class will always
  * wrap the content regardless of {@link android.support.v7.widget.RecyclerView} layout parameters.
+ *
+ * Now it's impossible to run add/remove animations with child views which have arbitrary dimensions (height for
+ * VERTICAL orientation and width for HORIZONTAL). However if child views have fixed dimensions
+ * {@link #setChildSize(int)} method might be used to let the layout manager know how big they are going to be.
+ * If animations are not used at all then a normal measuring procedure will run and child views will be measured during
+ * the measure pass.
  */
 public class LinearLayoutManager extends android.support.v7.widget.LinearLayoutManager {
 
@@ -15,6 +22,9 @@ public class LinearLayoutManager extends android.support.v7.widget.LinearLayoutM
 	private static final int DEFAULT_CHILD_SIZE = 100;
 
 	private final int[] childDimensions = new int[2];
+
+	private int childSize = DEFAULT_CHILD_SIZE;
+	private boolean hasChildSize;
 
 	@SuppressWarnings("UnusedDeclaration")
 	public LinearLayoutManager(Context context) {
@@ -69,10 +79,14 @@ public class LinearLayoutManager extends android.support.v7.widget.LinearLayoutM
 		// state
 		for (int i = 0; i < adapterItemCount; i++) {
 			if (vertical) {
-				if (i < stateItemCount) {
-					// we should not exceed state count, otherwise we'll get IndexOutOfBoundsException. For such items
-					// we will use previously calculated dimensions
-					measureChild(recycler, i, widthSpec, unspecified, childDimensions);
+				if (!hasChildSize) {
+					if (i < stateItemCount) {
+						// we should not exceed state count, otherwise we'll get IndexOutOfBoundsException. For such items
+						// we will use previously calculated dimensions
+						measureChild(recycler, i, widthSpec, unspecified, childDimensions);
+					} else {
+						logMeasureWarning(i);
+					}
 				}
 				height += childDimensions[CHILD_HEIGHT];
 				if (i == 0) {
@@ -82,10 +96,14 @@ public class LinearLayoutManager extends android.support.v7.widget.LinearLayoutM
 					break;
 				}
 			} else {
-				if (i < stateItemCount) {
-					// we should not exceed state count, otherwise we'll get IndexOutOfBoundsException. For such items
-					// we will use previously calculated dimensions
-					measureChild(recycler, i, unspecified, heightSpec, childDimensions);
+				if (!hasChildSize) {
+					if (i < stateItemCount) {
+						// we should not exceed state count, otherwise we'll get IndexOutOfBoundsException. For such items
+						// we will use previously calculated dimensions
+						measureChild(recycler, i, unspecified, heightSpec, childDimensions);
+					} else {
+						logMeasureWarning(i);
+					}
 				}
 				width += childDimensions[CHILD_WIDTH];
 				if (i == 0) {
@@ -119,6 +137,13 @@ public class LinearLayoutManager extends android.support.v7.widget.LinearLayoutM
 		}
 	}
 
+	private void logMeasureWarning(int child) {
+		if (BuildConfig.DEBUG) {
+			Log.w("LinearLayoutManager", "Can't measure child #" + child + ", previously used dimensions will be reused." +
+					"To remove this message either use #setChildSize() method or don't run RecyclerView animations");
+		}
+	}
+
 	private void initChildDimensions(int width, int height, boolean vertical) {
 		if (childDimensions[CHILD_WIDTH] != 0 || childDimensions[CHILD_HEIGHT] != 0) {
 			// already initialized, skipping
@@ -126,15 +151,17 @@ public class LinearLayoutManager extends android.support.v7.widget.LinearLayoutM
 		}
 		if (vertical) {
 			childDimensions[CHILD_WIDTH] = width;
-			childDimensions[CHILD_HEIGHT] = DEFAULT_CHILD_SIZE;
+			childDimensions[CHILD_HEIGHT] = childSize;
 		} else {
-			childDimensions[CHILD_WIDTH] = DEFAULT_CHILD_SIZE;
+			childDimensions[CHILD_WIDTH] = childSize;
 			childDimensions[CHILD_HEIGHT] = height;
 		}
 	}
 
 	@Override
 	public void setOrientation(int orientation) {
+		// might be called before the constructor of this class is called
+		//noinspection ConstantConditions
 		if (childDimensions != null) {
 			if (getOrientation() != orientation) {
 				childDimensions[CHILD_WIDTH] = 0;
@@ -142,6 +169,19 @@ public class LinearLayoutManager extends android.support.v7.widget.LinearLayoutM
 			}
 		}
 		super.setOrientation(orientation);
+	}
+
+	public void clearChildSize() {
+		hasChildSize = false;
+		setChildSize(DEFAULT_CHILD_SIZE);
+	}
+
+	public void setChildSize(int childSize) {
+		hasChildSize = true;
+		if (this.childSize != childSize) {
+			this.childSize = childSize;
+			requestLayout();
+		}
 	}
 
 	private void measureChild(RecyclerView.Recycler recycler, int position, int widthSpec, int heightSpec, int[] dimensions) {
