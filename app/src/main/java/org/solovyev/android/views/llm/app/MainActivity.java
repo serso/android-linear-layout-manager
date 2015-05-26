@@ -3,6 +3,7 @@ package org.solovyev.android.views.llm.app;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,8 +43,9 @@ public class MainActivity extends FragmentActivity {
 			}
 		});
 
-		final LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
 		final RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerview);
+		final LinearLayoutManager layoutManager = new LinearLayoutManager(recyclerView, LinearLayoutManager.VERTICAL, false);
+		layoutManager.setOverScrollMode(ViewCompat.OVER_SCROLL_IF_CONTENT_SCROLLS);
 		recyclerView.setLayoutManager(layoutManager);
 		recyclerView.addItemDecoration(new DividerItemDecoration(this, null));
 		recyclerView.setAdapter(adapter);

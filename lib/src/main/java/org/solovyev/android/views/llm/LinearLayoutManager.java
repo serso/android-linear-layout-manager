@@ -1,6 +1,7 @@
 package org.solovyev.android.views.llm;
 
 import android.content.Context;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
@@ -8,7 +9,7 @@ import android.view.View;
 /**
  * {@link android.support.v7.widget.LinearLayoutManager} which wraps its content. Note that this class will always
  * wrap the content regardless of {@link android.support.v7.widget.RecyclerView} layout parameters.
- *
+ * <p/>
  * Now it's impossible to run add/remove animations with child views which have arbitrary dimensions (height for
  * VERTICAL orientation and width for HORIZONTAL). However if child views have fixed dimensions
  * {@link #setChildSize(int)} method might be used to let the layout manager know how big they are going to be.
@@ -22,18 +23,44 @@ public class LinearLayoutManager extends android.support.v7.widget.LinearLayoutM
 	private static final int DEFAULT_CHILD_SIZE = 100;
 
 	private final int[] childDimensions = new int[2];
+	private final RecyclerView view;
 
 	private int childSize = DEFAULT_CHILD_SIZE;
 	private boolean hasChildSize;
+	private int overScrollMode = ViewCompat.OVER_SCROLL_ALWAYS;
 
 	@SuppressWarnings("UnusedDeclaration")
 	public LinearLayoutManager(Context context) {
 		super(context);
+		this.view = null;
 	}
 
 	@SuppressWarnings("UnusedDeclaration")
 	public LinearLayoutManager(Context context, int orientation, boolean reverseLayout) {
 		super(context, orientation, reverseLayout);
+		this.view = null;
+	}
+
+	@SuppressWarnings("UnusedDeclaration")
+	public LinearLayoutManager(RecyclerView view) {
+		super(view.getContext());
+		this.view = view;
+		this.overScrollMode = ViewCompat.getOverScrollMode(view);
+	}
+
+	@SuppressWarnings("UnusedDeclaration")
+	public LinearLayoutManager(RecyclerView view, int orientation, boolean reverseLayout) {
+		super(view.getContext(), orientation, reverseLayout);
+		this.view = view;
+		this.overScrollMode = ViewCompat.getOverScrollMode(view);
+	}
+
+	public void setOverScrollMode(int overScrollMode) {
+		if (overScrollMode < ViewCompat.OVER_SCROLL_ALWAYS || overScrollMode > ViewCompat.OVER_SCROLL_NEVER)
+			throw new IllegalArgumentException("Unknown overscroll mode: " + overScrollMode);
+		if (this.view == null) throw new IllegalStateException("view == null");
+		this.overScrollMode = overScrollMode;
+		ViewCompat.setOverScrollMode(view, overScrollMode);
 	}
 
 	public static int makeUnspecifiedSpec() {
@@ -115,7 +142,8 @@ public class LinearLayoutManager extends android.support.v7.widget.LinearLayoutM
 			}
 		}
 
-		if ((vertical && height < heightSize) || (!vertical && width < widthSize)) {
+		final boolean fit = (vertical && height < heightSize) || (!vertical && width < widthSize);
+		if (fit) {
 			// we really should wrap the contents of the view, let's do it
 
 			if (exactWidth) {
@@ -134,6 +162,10 @@ public class LinearLayoutManager extends android.support.v7.widget.LinearLayoutM
 		} else {
 			// if calculated height/width exceeds requested height/width let's use default "onMeasure" implementation
 			super.onMeasure(recycler, state, widthSpec, heightSpec);
+		}
+
+		if (view != null && overScrollMode == ViewCompat.OVER_SCROLL_IF_CONTENT_SCROLLS) {
+			ViewCompat.setOverScrollMode(view, fit ? ViewCompat.OVER_SCROLL_NEVER : ViewCompat.OVER_SCROLL_ALWAYS);
 		}
 	}
 
