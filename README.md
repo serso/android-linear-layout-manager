@@ -16,7 +16,7 @@ Note that if the child views in your RecyclerView have the fixed size LinearLayo
 to avoid unnecessary measuring.
 
 ## Installation
-<pre><code>compile 'org.solovyev.android.views:linear-layout-manager:0.2@aar'</core></pre>
+<pre><code>compile 'org.solovyev.android.views:linear-layout-manager:0.3@aar'</core></pre>
 
 ## Applications
 
