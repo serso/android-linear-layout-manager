@@ -120,7 +120,7 @@ public class LinearLayoutManager extends android.support.v7.widget.LinearLayoutM
 					if (i < stateItemCount) {
 						// we should not exceed state count, otherwise we'll get IndexOutOfBoundsException. For such items
 						// we will use previously calculated dimensions
-						measureChild(recycler, i, widthSpec, unspecified, childDimensions);
+						measureChild(recycler, i, widthSize, unspecified, childDimensions);
 					} else {
 						logMeasureWarning(i);
 					}
@@ -137,7 +137,7 @@ public class LinearLayoutManager extends android.support.v7.widget.LinearLayoutM
 					if (i < stateItemCount) {
 						// we should not exceed state count, otherwise we'll get IndexOutOfBoundsException. For such items
 						// we will use previously calculated dimensions
-						measureChild(recycler, i, unspecified, heightSpec, childDimensions);
+						measureChild(recycler, i, unspecified, heightSize, childDimensions);
 					} else {
 						logMeasureWarning(i);
 					}
@@ -227,7 +227,7 @@ public class LinearLayoutManager extends android.support.v7.widget.LinearLayoutM
 		}
 	}
 
-	private void measureChild(RecyclerView.Recycler recycler, int position, int widthSpec, int heightSpec, int[] dimensions) {
+	private void measureChild(RecyclerView.Recycler recycler, int position, int widthSize, int heightSize, int[] dimensions) {
 		final View child = recycler.getViewForPosition(position);
 
 		final RecyclerView.LayoutParams p = (RecyclerView.LayoutParams) child.getLayoutParams();
@@ -246,8 +246,8 @@ public class LinearLayoutManager extends android.support.v7.widget.LinearLayoutM
 		final int hDecoration = getRightDecorationWidth(child) + getLeftDecorationWidth(child);
 		final int vDecoration = getTopDecorationHeight(child) + getBottomDecorationHeight(child);
 
-		final int childWidthSpec = getChildMeasureSpec(widthSpec, hPadding + hMargin + hDecoration, p.width, canScrollHorizontally());
-		final int childHeightSpec = getChildMeasureSpec(heightSpec, vPadding + vMargin + vDecoration, p.height, canScrollVertically());
+		final int childWidthSpec = getChildMeasureSpec(widthSize, hPadding + hMargin + hDecoration, p.width, canScrollHorizontally());
+		final int childHeightSpec = getChildMeasureSpec(heightSize, vPadding + vMargin + vDecoration, p.height, canScrollVertically());
 
 		child.measure(childWidthSpec, childHeightSpec);
 
