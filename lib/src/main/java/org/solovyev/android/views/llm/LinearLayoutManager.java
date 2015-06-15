@@ -82,6 +82,9 @@ public class LinearLayoutManager extends android.support.v7.widget.LinearLayoutM
 		final int widthSize = View.MeasureSpec.getSize(widthSpec);
 		final int heightSize = View.MeasureSpec.getSize(heightSpec);
 
+		final boolean hasWidthSize = widthMode != View.MeasureSpec.UNSPECIFIED;
+		final boolean hasHeightSize = heightMode != View.MeasureSpec.UNSPECIFIED;
+
 		final boolean exactWidth = widthMode == View.MeasureSpec.EXACTLY;
 		final boolean exactHeight = heightMode == View.MeasureSpec.EXACTLY;
 
@@ -126,7 +129,7 @@ public class LinearLayoutManager extends android.support.v7.widget.LinearLayoutM
 				if (i == 0) {
 					width = childDimensions[CHILD_WIDTH];
 				}
-				if (height >= heightSize) {
+				if (hasHeightSize && height >= heightSize) {
 					break;
 				}
 			} else {
@@ -143,13 +146,14 @@ public class LinearLayoutManager extends android.support.v7.widget.LinearLayoutM
 				if (i == 0) {
 					height = childDimensions[CHILD_HEIGHT];
 				}
-				if (width >= widthSize) {
+				if (hasWidthSize && width >= widthSize) {
 					break;
 				}
 			}
 		}
 
-		final boolean fit = (vertical && height < heightSize) || (!vertical && width < widthSize);
+		final boolean fit = (vertical && (!hasHeightSize || height < heightSize))
+				|| (!vertical && (!hasWidthSize || width < widthSize));
 		if (fit) {
 			// we really should wrap the contents of the view, let's do it
 
