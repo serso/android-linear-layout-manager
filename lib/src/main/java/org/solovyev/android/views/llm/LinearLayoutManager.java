@@ -152,30 +152,30 @@ public class LinearLayoutManager extends android.support.v7.widget.LinearLayoutM
 			}
 		}
 
-		final boolean fit = (vertical && (!hasHeightSize || height < heightSize))
-				|| (!vertical && (!hasWidthSize || width < widthSize));
-		if (fit) {
-			// we really should wrap the contents of the view, let's do it
-
-			if (exactWidth) {
-				width = widthSize;
-			} else {
-				width += getPaddingLeft() + getPaddingRight();
-			}
-
-			if (exactHeight) {
-				height = heightSize;
-			} else {
-				height += getPaddingTop() + getPaddingBottom();
-			}
-
-			setMeasuredDimension(width, height);
+		if (exactWidth) {
+			width = widthSize;
 		} else {
-			// if calculated height/width exceeds requested height/width let's use default "onMeasure" implementation
-			super.onMeasure(recycler, state, widthSpec, heightSpec);
+			width += getPaddingLeft() + getPaddingRight();
+			if (hasWidthSize) {
+				width = Math.min(width, widthSize);
+			}
 		}
 
+		if (exactHeight) {
+			height = heightSize;
+		} else {
+			height += getPaddingTop() + getPaddingBottom();
+			if (hasHeightSize) {
+				height = Math.min(height, heightSize);
+			}
+		}
+
+		setMeasuredDimension(width, height);
+
 		if (view != null && overScrollMode == ViewCompat.OVER_SCROLL_IF_CONTENT_SCROLLS) {
+			final boolean fit = (vertical && (!hasHeightSize || height < heightSize))
+					|| (!vertical && (!hasWidthSize || width < widthSize));
+
 			ViewCompat.setOverScrollMode(view, fit ? ViewCompat.OVER_SCROLL_NEVER : ViewCompat.OVER_SCROLL_ALWAYS);
 		}
 	}
