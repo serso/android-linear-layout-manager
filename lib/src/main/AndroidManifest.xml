@@ -20,8 +20,4 @@
   ~ Site:  http://se.solovyev.org
   -->
 
-<manifest package="org.solovyev.android.views.llm"
-	xmlns:android="http://schemas.android.com/apk/res/android">
-
-	<application android:allowBackup="true"/>
-</manifest>
+<manifest package="org.solovyev.android.views.llm" />
