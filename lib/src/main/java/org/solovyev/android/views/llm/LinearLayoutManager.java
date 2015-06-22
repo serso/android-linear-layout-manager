@@ -1,10 +1,13 @@
 package org.solovyev.android.views.llm;
 
 import android.content.Context;
+import android.graphics.Rect;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+
+import java.lang.reflect.Field;
 
 /**
  * {@link android.support.v7.widget.LinearLayoutManager} which wraps its content. Note that this class will always
@@ -18,6 +21,9 @@ import android.view.View;
  */
 public class LinearLayoutManager extends android.support.v7.widget.LinearLayoutManager {
 
+	private static boolean canMakeInsetsDirty = true;
+	private static Field insetsDirtyField = null;
+
 	private static final int CHILD_WIDTH = 0;
 	private static final int CHILD_HEIGHT = 1;
 	private static final int DEFAULT_CHILD_SIZE = 100;
@@ -28,6 +34,7 @@ public class LinearLayoutManager extends android.support.v7.widget.LinearLayoutM
 	private int childSize = DEFAULT_CHILD_SIZE;
 	private boolean hasChildSize;
 	private int overScrollMode = ViewCompat.OVER_SCROLL_ALWAYS;
+	private final Rect tmpRect = new Rect();
 
 	@SuppressWarnings("UnusedDeclaration")
 	public LinearLayoutManager(Context context) {
@@ -227,6 +234,11 @@ public class LinearLayoutManager extends android.support.v7.widget.LinearLayoutM
 		final int hMargin = p.leftMargin + p.rightMargin;
 		final int vMargin = p.topMargin + p.bottomMargin;
 
+		// we must make insets dirty in order calculateItemDecorationsForChild to work
+		makeInsetsDirty(p);
+		// this method should be called before any getXxxDecorationXxx() methods
+		calculateItemDecorationsForChild(child, tmpRect);
+
 		final int hDecoration = getRightDecorationWidth(child) + getLeftDecorationWidth(child);
 		final int vDecoration = getTopDecorationHeight(child) + getBottomDecorationHeight(child);
 
@@ -238,6 +250,32 @@ public class LinearLayoutManager extends android.support.v7.widget.LinearLayoutM
 		dimensions[CHILD_WIDTH] = getDecoratedMeasuredWidth(child) + p.leftMargin + p.rightMargin;
 		dimensions[CHILD_HEIGHT] = getDecoratedMeasuredHeight(child) + p.bottomMargin + p.topMargin;
 
+		// as view is recycled let's not keep old measured values
+		makeInsetsDirty(p);
 		recycler.recycleView(child);
+	}
+
+	private static void makeInsetsDirty(RecyclerView.LayoutParams p) {
+		if (!canMakeInsetsDirty) {
+			return;
+		}
+		try {
+			if (insetsDirtyField == null) {
+				insetsDirtyField = RecyclerView.LayoutParams.class.getDeclaredField("mInsetsDirty");
+				insetsDirtyField.setAccessible(true);
+			}
+			insetsDirtyField.set(p, true);
+		} catch (NoSuchFieldException e) {
+			onMakeInsertDirtyFailed();
+		} catch (IllegalAccessException e) {
+			onMakeInsertDirtyFailed();
+		}
+	}
+
+	private static void onMakeInsertDirtyFailed() {
+		canMakeInsetsDirty = false;
+		if (BuildConfig.DEBUG) {
+			Log.w("LinearLayoutManager", "Can't make LayoutParams insets dirty, decorations measurements might be incorrect");
+		}
 	}
 }
