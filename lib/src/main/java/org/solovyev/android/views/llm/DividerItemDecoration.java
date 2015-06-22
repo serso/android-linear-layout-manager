@@ -92,6 +92,7 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
 
 		final int orientation = getOrientation(parent);
 		final int childCount = parent.getChildCount();
+		final int adapterCount = parent.getAdapter().getItemCount();
 
 		final boolean vertical = orientation == LinearLayoutManager.VERTICAL;
 		final int size;
@@ -105,9 +106,13 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
 			bottom = parent.getHeight() - parent.getPaddingBottom();
 		}
 
-		for (int i = first ? 0 : 1; i < childCount; i++) {
+		for (int i = 0; i < childCount; i++) {
 			final View child = parent.getChildAt(i);
 			final RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) child.getLayoutParams();
+			final int position = params.getViewLayoutPosition();
+			if (position == 0 && !first) {
+				continue;
+			}
 			if (vertical) {
 				top = child.getTop() - params.topMargin - size;
 				bottom = top + size;
@@ -122,15 +127,18 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
 		if (last && childCount > 0) {
 			final View child = parent.getChildAt(childCount - 1);
 			final RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) child.getLayoutParams();
-			if (vertical) {
-				top = child.getBottom() + params.bottomMargin;
-				bottom = top + size;
-			} else {
-				left = child.getRight() + params.rightMargin;
-				right = left + size;
+			final int position = params.getViewLayoutPosition();
+			if (position == adapterCount - 1) {
+				if (vertical) {
+					top = child.getBottom() + params.bottomMargin;
+					bottom = top + size;
+				} else {
+					left = child.getRight() + params.rightMargin;
+					right = left + size;
+				}
+				divider.setBounds(left, top, right, bottom);
+				divider.draw(c);
 			}
-			divider.setBounds(left, top, right, bottom);
-			divider.draw(c);
 		}
 	}
 
