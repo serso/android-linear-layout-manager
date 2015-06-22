@@ -64,17 +64,14 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
 		final boolean firstItem = position == 0;
 		final boolean lastItem = position == parent.getAdapter().getItemCount() - 1;
 		final boolean dividerBefore = first || !firstItem;
-		if (!dividerBefore) {
-			super.getItemOffsets(outRect, view, parent, state);
-			return;
-		}
+		final boolean dividerAfter = last && lastItem;
 
 		if (getOrientation(parent) == LinearLayoutManager.VERTICAL) {
-			outRect.top = dividerHeight;
-			outRect.bottom = last && lastItem ? dividerHeight : 0;
+			outRect.top = dividerBefore ? dividerHeight : 0;
+			outRect.bottom = dividerAfter ? dividerHeight : 0;
 		} else {
-			outRect.left = dividerWidth;
-			outRect.right = last && lastItem ? dividerWidth : 0;
+			outRect.left = dividerBefore ? dividerWidth : 0;
+			outRect.right = dividerAfter ? dividerWidth : 0;
 		}
 	}
 
