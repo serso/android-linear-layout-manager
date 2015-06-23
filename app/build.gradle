@@ -80,6 +80,18 @@ archivesBaseName = "linear-layout-manager-app"
 version = version_name()
 
 uploadArchives {
+    doFirst {
+        // for some reason Gradle :uploadArchives tries to upload null.txt.asc and null.map artifacts.
+        // As we don't want those let's filter them now (note that these files are not included in the
+        // list of project artifacts, so their origin is not clear)
+        configurations.archives.artifacts.removeAll { artifact ->
+            def removing = artifact.classifier == null && (artifact.type == 'txt.asc' || artifact.type == 'map')
+            if (removing) {
+                println "Removing artifacts: ${artifact.name}-${artifact.classifier}.${artifact.type}"
+            }
+            return removing
+        }
+    }
     repositories {
         mavenDeployer {
             beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
@@ -95,7 +107,7 @@ uploadArchives {
             pom.project {
                 name 'Linear Layout Manager App'
                 packaging 'apk'
-                description 'Linera Layout Manager sample application'
+                description 'Linear Layout Manager sample application'
                 url 'https://github.com/serso/android-linear-layout-manager'
 
                 scm {
