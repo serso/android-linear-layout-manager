@@ -89,7 +89,9 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration {
 
 		final int orientation = getOrientation(parent);
 		final int childCount = parent.getChildCount();
-		final int adapterCount = parent.getAdapter().getItemCount();
+
+		final RecyclerView.Adapter adapter = parent.getAdapter();
+		final int adapterCount = adapter != null ? adapter.getItemCount() : 0;
 
 		final boolean vertical = orientation == LinearLayoutManager.VERTICAL;
 		final int size;
