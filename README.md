@@ -21,7 +21,7 @@ Maven dependency:
 <dependency>
     <groupId>org.solovyev.android.views</groupId>
     <artifactId>linear-layout-manager</artifactId>
-    <version>0.4</version>
+    <version>0.5</version>
     <type>apklib</type>
 </dependency>
 ```
