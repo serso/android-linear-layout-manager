@@ -228,7 +228,15 @@ public class LinearLayoutManager extends android.support.v7.widget.LinearLayoutM
 	}
 
 	private void measureChild(RecyclerView.Recycler recycler, int position, int widthSize, int heightSize, int[] dimensions) {
-		final View child = recycler.getViewForPosition(position);
+		final View child;
+		try {
+			child = recycler.getViewForPosition(position);
+		} catch (IndexOutOfBoundsException e) {
+			if (BuildConfig.DEBUG) {
+				Log.w("LinearLayoutManager", "LinearLayoutManager doesn't work well with animations. Consider switching them off", e);
+			}
+			return;
+		}
 
 		final RecyclerView.LayoutParams p = (RecyclerView.LayoutParams) child.getLayoutParams();
 

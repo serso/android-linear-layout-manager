@@ -1,0 +1,3 @@
+<resources>
+   <dimen name="dialog_max_height">350dp</dimen>
+</resources>

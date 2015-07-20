@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class MainActivity extends FragmentActivity {
+public class RandomListActivity extends FragmentActivity {
 
 	private final Handler handler = new Handler();
 	private Updater updater;
@@ -26,7 +26,7 @@ public class MainActivity extends FragmentActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		setContentView(R.layout.activity_main);
+		setContentView(R.layout.activity_random_list);
 
 		final MyAdapter adapter = new MyAdapter();
 
