@@ -26,6 +26,9 @@ Maven dependency:
 </dependency>
 ```
 
+## License
+Library is distributed under Apache 2.0 license, see LICENSE.txt
+
 ## Applications
 
 The following applications use this library:
