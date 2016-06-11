@@ -1,5 +1,8 @@
 # Linear Layout Manager
 
+## DEPRECATED
+RecyclerView supports WRAP_CONTENT starting from Android Support Library 23.2. More details here: http://android-developers.blogspot.se/2016/02/android-support-library-232.html
+
 ## Description
 Implementation of [LinearLayoutManager](https://developer.android.com/reference/android/support/v7/widget/LinearLayoutManager.html) which wraps its contents.
 
